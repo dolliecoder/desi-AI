@@ -1,0 +1,15 @@
+# FastAPI and server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-dotenv==1.0.0
+
+# Configuration and validation
+pydantic==2.10.6
+pydantic-settings==2.7.1
+
+# OpenAI-compatible API (async)
+aiohttp==3.9.3
+
+# PDF processing
+PyPDF2==3.0.1
+python-multipart==0.0.6
