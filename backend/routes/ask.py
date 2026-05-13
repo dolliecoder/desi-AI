@@ -24,13 +24,13 @@ async def ask_question(request: AskRequest):
         try:
             result = await asyncio.wait_for(
                 service.ask(request.query),
-                timeout=30.0  # 30 second timeout for full pipeline
+                timeout=90.0  # 90 second timeout for full pipeline
             )
         except asyncio.TimeoutError:
             print("[ASK/ENDPOINT] ERROR: Timeout")
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                detail="Request timed out after 30 seconds"
+                detail="Request timed out after 90 seconds"
             )
         
         print(f"[ASK/ENDPOINT] ✓ Success")
