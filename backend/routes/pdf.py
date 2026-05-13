@@ -45,12 +45,12 @@ async def upload_pdf(file: UploadFile = File(...)):
         try:
             result = await asyncio.wait_for(
                 asyncio.to_thread(pdf_service.process_pdf, content, file.filename),
-                timeout=30.0
+                timeout=120.0
             )
         except asyncio.TimeoutError:
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                detail="PDF processing timed out"
+                detail="PDF processing timed out after 120 seconds"
             )
         
         # Store chunks
@@ -149,12 +149,12 @@ Answer:"""
                     user_prompt=prompt,
                     temperature=0.7
                 ),
-                timeout=20.0
+                timeout=60.0
             )
         except asyncio.TimeoutError:
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-                detail="Answer generation timed out"
+                detail="Answer generation timed out after 60 seconds"
             )
         
         print(f"[PDF/ASK] ✓ Answer generated ({len(answer)} chars)")
