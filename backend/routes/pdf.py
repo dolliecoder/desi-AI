@@ -9,6 +9,8 @@ import asyncio
 
 router = APIRouter(prefix="/pdf", tags=["PDF"])
 
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
+
 @router.post(
     "/upload",
     response_model=PDFUploadResponse,
@@ -38,6 +40,12 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("[PDF/UPLOAD] Reading file content...")
         content = await file.read()
         print(f"[PDF/UPLOAD] Read {len(content)} bytes")
+
+        if len(content) > MAX_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="PDF is larger than 20 MB"
+            )
         
         # Process PDF
         pdf_service = get_pdf_service()
