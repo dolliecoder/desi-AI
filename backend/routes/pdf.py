@@ -27,7 +27,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     print(f"\n[PDF/UPLOAD] Received file: {file.filename}")
     
     # Validate file type
-    if not file.filename.endswith('.pdf'):
+    if not file.filename or not file.filename.lower().endswith('.pdf'):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only PDF files are allowed"
@@ -38,6 +38,13 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("[PDF/UPLOAD] Reading file content...")
         content = await file.read()
         print(f"[PDF/UPLOAD] Read {len(content)} bytes")
+
+        # The name alone proves nothing: a real PDF starts with the %PDF- header.
+        if not content.startswith(b'%PDF-'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The uploaded file is not a valid PDF"
+            )
         
         # Process PDF
         pdf_service = get_pdf_service()
