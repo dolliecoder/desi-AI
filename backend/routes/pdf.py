@@ -28,8 +28,8 @@ async def upload_pdf(file: UploadFile = File(...)):
     """
     print(f"\n[PDF/UPLOAD] Received file: {file.filename}")
     
-    # Validate file type
-    if not file.filename.endswith('.pdf'):
+    # Validate file type (extension is case-insensitive)
+    if not (file.filename or "").lower().endswith('.pdf'):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only PDF files are allowed"
@@ -45,6 +45,13 @@ async def upload_pdf(file: UploadFile = File(...)):
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="PDF is larger than 20 MB"
+            )
+        
+        # Validate content (a renamed non-PDF must not reach the parser)
+        if not content.startswith(b'%PDF-'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File content is not a PDF"
             )
         
         # Process PDF
